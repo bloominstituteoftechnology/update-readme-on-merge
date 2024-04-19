@@ -1,0 +1,27 @@
+name: Update README on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
+
+    - name: Update README
+      run: |
+        echo "\nMerged on $(date +'%Y-%m-%d')" >> README.md
+
+    - name: Commit and push if changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add README.md
+        git commit -m "Update README with merge date"
+        git push
