@@ -12,11 +12,11 @@ jobs:
     - name: Checkout the repository
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.head_ref }}
+        ref: ${{ github.event.pull_request.base.ref }}
 
     - name: Update README
       run: |
-        echo "\nMerged on $(date +'%Y-%m-%d')" >> README.md
+        echo -e "\nMerged on $(date +'%Y-%m-%d')" >> README.md
 
     - name: Commit and push if changes
       run: |
@@ -24,4 +24,4 @@ jobs:
         git config --local user.name "GitHub Action"
         git add README.md
         git commit -m "Update README with merge date"
-        git push
+        git push origin ${{ github.event.pull_request.base.ref }}
