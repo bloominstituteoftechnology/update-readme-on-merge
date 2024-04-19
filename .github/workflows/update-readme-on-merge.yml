@@ -16,7 +16,8 @@ jobs:
 
     - name: Update README
       run: |
-        echo "\nMerged on $(date +'%Y-%m-%d')" >> README.md
+        # echo "\nMerged on $(date +'%Y-%m-%d')" >> README.md
+        echo "gaga" >> README.md
 
     - name: Commit and push if changes
       run: |
