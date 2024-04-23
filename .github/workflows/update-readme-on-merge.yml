@@ -27,21 +27,19 @@ jobs:
 
       - name: Append date to README
         run: |
-          echo "\nUpdated on $(date +'%Y-%m-%d')" >> README.md
+          echo "\nUpdated on $(date +'%Y-%m-%d %H:%M:%S')" >> README.md
 
       - name: Commit changes
         run: |
           git add README.md
           git commit -m "Append current date to README"
-
-      - name: Push changes
-        run: |
           git push origin update-readme-${{ github.run_id }}
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v4
         with:
           branch: update-readme-${{ github.run_id }}
+          commit-message: "Append current date to README"
           title: "Update README with current date"
           body: "Automatically update README with the current date upon PR merge."
           base: "main"
