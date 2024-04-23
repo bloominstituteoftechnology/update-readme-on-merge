@@ -1,4 +1,4 @@
-name: Update README on PR Merge
+name: Update README on Merge
 
 on:
   pull_request:
@@ -8,46 +8,31 @@ jobs:
   update-readme:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout the base branch
+    - name: Checkout
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.pull_request.base.ref }}  # Ensures starting from the base branch
+        ref: 'main'  # Ensure we are on the main branch
 
-    - name: Configure git
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-
-    - name: Create a new branch
-      run: |
-        NEW_BRANCH="update-readme-${{ github.run_id }}"
-        git checkout -b $NEW_BRANCH
-
-    - name: Append random integer to README
-      run: |
-        echo $RANDOM >> README.md
-
-    - name: Commit changes
-      run: |
-        git add README.md
-        git commit -m "Append random integer to README"
-
-    - name: Push new branch
-      run: |
-        git push --set-upstream origin $NEW_BRANCH
-
-    - name: Create Pull Request
+    - name: Get number of commits using GitHub API
+      id: get-commits
       env:
-        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        PR_TITLE="Update README with random integer"
-        PR_BODY="This is an auto-generated PR to update README with a random integer."
-        PR_BASE="${{ github.event.pull_request.base.ref }}"
-        PR_HEAD="$NEW_BRANCH"
-        curl \
-          -X POST \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/${{ github.repository }}/pulls" \
-          -d '{"title":"'$PR_TITLE'", "body":"'$PR_BODY'", "head":"'$PR_HEAD'", "base":"'$PR_BASE'"}'
+        NUMBER_OF_COMMITS=$(curl -H "Authorization: token $GITHUB_TOKEN" \
+          "https://api.github.com/repos/${{ github.repository }}/commits?per_page=1" | jq -r '.[0].sha' | wc -l)
+        echo "NUMBER_OF_COMMITS=$NUMBER_OF_COMMITS" >> $GITHUB_ENV
+
+    - name: Update README.md
+      run: |
+        echo "Updating README.md with the number of commits"
+        echo "\nTotal Commits: ${{ env.NUMBER_OF_COMMITS }}" >> README.md
+
+    - name: Commit and Push
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git add README.md
+        git commit -m "Update README with the number of commits"
+        git push
