@@ -39,5 +39,3 @@ jobs:
         title: "Update README with random integer"
         body: "This is an auto-generated PR to update README with a random integer."
         commit-message: "Append random integer to README"
-        labels:
-          - automated-pr
