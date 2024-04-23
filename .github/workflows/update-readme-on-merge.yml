@@ -35,7 +35,7 @@ jobs:
 
     - name: Push new branch
       run: |
-        git push origin $NEW_BRANCH
+        git push --set-upstream origin $NEW_BRANCH
 
     - name: Create Pull Request
       env:
@@ -44,7 +44,7 @@ jobs:
         PR_TITLE="Update README with random integer"
         PR_BODY="This is an auto-generated PR to update README with a random integer."
         PR_BASE="${{ github.event.pull_request.base.ref }}"
-        PR_HEAD="update-readme-${{ github.run_id }}"
+        PR_HEAD="$NEW_BRANCH"
         curl \
           -X POST \
           -H "Authorization: token $GITHUB_TOKEN" \
