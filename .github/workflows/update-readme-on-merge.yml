@@ -9,34 +9,45 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
+    - name: Checkout the base branch
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.pull_request.base.ref }}
+        ref: ${{ github.event.pull_request.base.ref }}  # Ensures starting from the base branch
 
-    - name: Set up Git
+    - name: Configure git
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Create new branch
-      run: git checkout -b update-readme-${{ github.run_id }}
+    - name: Create a new branch
+      run: |
+        NEW_BRANCH="update-readme-${{ github.run_id }}"
+        git checkout -b $NEW_BRANCH
 
     - name: Append random integer to README
-      run: echo $RANDOM >> README.md
+      run: |
+        echo $RANDOM >> README.md
 
-    - name: Commit and Push Changes
+    - name: Commit changes
       run: |
         git add README.md
         git commit -m "Append random integer to README"
-        git push --set-upstream origin update-readme-${{ github.run_id }}
+
+    - name: Push new branch
+      run: |
+        git push origin $NEW_BRANCH
 
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        branch: update-readme-${{ github.run_id }}
-        base: ${{ github.event.pull_request.base.ref }}
-        title: "Update README with random integer"
-        body: "This is an auto-generated PR to update README with a random integer."
-        labels: automated-pr
+      env:
+        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      run: |
+        PR_TITLE="Update README with random integer"
+        PR_BODY="This is an auto-generated PR to update README with a random integer."
+        PR_BASE="${{ github.event.pull_request.base.ref }}"
+        PR_HEAD="update-readme-${{ github.run_id }}"
+        curl \
+          -X POST \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls" \
+          -d '{"title":"'$PR_TITLE'", "body":"'$PR_BODY'", "head":"'$PR_HEAD'", "base":"'$PR_BASE'"}'
