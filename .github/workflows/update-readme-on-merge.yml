@@ -12,13 +12,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        ref: 'main'
+        fetch-depth: 0  # Important to allow history for all branches
 
     - name: Set up Git
       run: |
         git config user.name "github-actions[bot]"
-        git config user.email "<your-email>"
-        git fetch --unshallow
+        git config user.email "github-actions[bot]@users.noreply.github.com"
 
     - name: Create new branch
       run: git checkout -b update-readme-${{ github.run_id }}
@@ -26,19 +25,19 @@ jobs:
     - name: Append random integer to README
       run: echo $RANDOM >> README.md
 
-    - name: Commit changes
+    - name: Commit and Push Changes
       run: |
         git add README.md
         git commit -m "Append random integer to README"
+        git push origin update-readme-${{ github.run_id }}
 
-    - name: Push changes
-      run: git push origin update-readme-${{ github.run_id }}
-
-    - name: Open a pull request
-      uses: repo-sync/pull-request@v3
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v4
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        source_branch: "update-readme-${{ github.run_id }}"
-        destination_branch: "main"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: update-readme-${{ github.run_id }}
         title: "Update README with random integer"
         body: "This is an auto-generated PR to update README with a random integer."
+        commit-message: "Append random integer to README"
+        labels:
+          - automated-pr
