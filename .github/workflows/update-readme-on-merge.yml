@@ -28,3 +28,5 @@ jobs:
 
     - name: Run script to update README
       run: node .github/scripts/update-readme.js
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
