@@ -18,18 +18,18 @@ async function summarizeDiff(pullNumber) {
     owner: GITHUB_REPOSITORY_OWNER,
     repo: GITHUB_REPOSITORY_NAME,
     pull_number: pullNumber,
-    mediaType: {
-      format: 'diff',
-    },
+    mediaType: { format: 'diff' },
   });
 
-  const response = await openai.Completion.create({
-    model: "text-davinci-002",
-    prompt: "Summarize this diff:\n" + diffData,
-    max_tokens: 150,
-  });
+  const { data: chatCompletion, response: raw } = await openai.chat.completions
+    .create({
+      messages: [{ role: 'user', content: "Summarize this diff:\n" + diffData }],
+      model: 'gpt-3.5-turbo',
+    })
+    .withResponse();
 
-  return response.choices[0].text.trim();
+  console.log(chatCompletion, raw);
+  return JSON.stringify(chatCompletion);
 }
 
 async function updateReadmeAndCreatePR() {
