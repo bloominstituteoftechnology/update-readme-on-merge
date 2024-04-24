@@ -1,3 +1,5 @@
 # Update README on Merge
 
-## Below are descriptions of the diff, created by AI
+My favorite band is Iron Maiden!
+
+## Below is a description of the diff, created by AI
