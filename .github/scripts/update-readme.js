@@ -14,11 +14,11 @@ const {
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-async function summarizeDiff(pullNumber) {
+async function summarizeDiff() {
   const { data: diffData } = await octokit.rest.pulls.get({
     owner: GITHUB_REPOSITORY_OWNER,
     repo: GITHUB_REPOSITORY_NAME,
-    pull_number: pullNumber,
+    pull_number: GITHUB_PULL_REQUEST_NUMBER,
     mediaType: { format: 'diff' },
   });
 
@@ -33,7 +33,7 @@ async function summarizeDiff(pullNumber) {
 }
 
 async function updateReadmeAndCreatePR() {
-  const summary = await summarizeDiff(GITHUB_PULL_REQUEST_NUMBER);
+  const summary = await summarizeDiff();
   const newBranch = `update-readme-${Date.now()}`;
 
   execSync(`git checkout -b ${newBranch}`);
