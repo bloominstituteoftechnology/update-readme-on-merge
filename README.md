@@ -1,3 +1,3 @@
-# Update README on Merge, and Lady Gaga RULES
+# Update README on Merge
 
 ## Below are descriptions of the diff, created by AI
