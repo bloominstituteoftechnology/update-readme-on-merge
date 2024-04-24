@@ -23,8 +23,8 @@ jobs:
       with:
         node-version: '20'
 
-    # - name: Install Node.js dependencies
-    #   run: npm install
+    - name: Install Node.js dependencies
+      run: npm install
 
     - name: Run script to update README
       run: node .github/scripts/update-readme.js
