@@ -21,13 +21,14 @@ async function summarizeDiff(pullNumber) {
     mediaType: { format: 'diff' },
   });
 
-  const { data: chatCompletion } = await openai.chat.completions
+  const { data: chatCompletion, response: raw } = await openai.chat.completions
     .create({
       messages: [{ role: 'user', content: "Summarize this diff:\n" + diffData }],
       model: 'gpt-3.5-turbo',
-    });
+    })
+    .withResponse();
 
-  return chatCompletion.choices[0].message.content;
+  return JSON.stringify(chatCompletion);
 }
 
 async function updateReadmeAndCreatePR() {
