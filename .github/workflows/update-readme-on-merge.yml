@@ -30,5 +30,7 @@ jobs:
       run: node .github/scripts/update-readme.js
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        GITHUB_PULL_REQUEST_NUMBER: ${{ github.event.number }}
         GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
