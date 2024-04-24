@@ -24,7 +24,7 @@ async function summarizeDiff(pullNumber) {
   const { data: chatCompletion, response: raw } = await openai.chat.completions
     .create({
       messages: [{ role: 'user', content: "Summarize this diff:\n" + diffData }],
-      model: 'davinci-002',
+      model: 'gpt-3.5-turbo',
     })
     .withResponse();
 
