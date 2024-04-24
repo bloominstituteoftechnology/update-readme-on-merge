@@ -4,14 +4,12 @@ const { Octokit } = require('@octokit/rest');
 const { OpenAI } = require('openai');
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Make sure this is set in the GitHub Secrets!
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GITHUB_REPOSITORY_OWNER = process.env.GITHUB_REPOSITORY_OWNER;
 const GITHUB_REPOSITORY_NAME = process.env.GITHUB_REPOSITORY_NAME;
 
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
-const openai = new OpenAI({
-  apiKey: OPENAI_API_KEY,
-});
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 async function summarizeDiff(pullNumber) {
   const { data: diffData } = await octokit.rest.pulls.get({
@@ -32,7 +30,7 @@ async function summarizeDiff(pullNumber) {
 }
 
 async function updateReadmeAndCreatePR() {
-  const pullNumber = process.env.GITHUB_PULL_REQUEST_NUMBER; // Set this in your GitHub Actions workflow
+  const pullNumber = process.env.GITHUB_PULL_REQUEST_NUMBER;
   const summary = await summarizeDiff(pullNumber);
   const newBranch = `update-readme-${Date.now()}`;
 
