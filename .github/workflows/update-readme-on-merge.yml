@@ -1,38 +1,30 @@
-name: Update README on Merge
+name: Update README on PR Merge
 
 on:
   pull_request:
     types: [closed]
+    branches:
+      - main
 
 jobs:
   update-readme:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
 
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        ref: 'main'  # Ensure we are on the main branch
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
 
-    - name: Get number of commits using GitHub API
-      id: get-commits
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        NUMBER_OF_COMMITS=$(curl -H "Authorization: token $GITHUB_TOKEN" \
-          "https://api.github.com/repos/${{ github.repository }}/commits?per_page=1" | jq -r '.[0].sha' | wc -l)
-        echo "NUMBER_OF_COMMITS=$NUMBER_OF_COMMITS" >> $GITHUB_ENV
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
 
-    - name: Update README.md
-      run: |
-        echo "Updating README.md with the number of commits"
-        echo "\nTotal Commits: ${{ env.NUMBER_OF_COMMITS }}" >> README.md
+    - name: Install Node.js dependencies
+      run: npm install
 
-    - name: Commit and Push
-      run: |
-        git config --global user.name 'github-actions'
-        git config --global user.email 'github-actions@github.com'
-        git add README.md
-        git commit -m "Update README with the number of commits"
-        git push
+    - name: Run script to update README
+      run: node .github/scripts/update-readme.js
